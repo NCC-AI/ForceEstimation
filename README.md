@@ -20,7 +20,7 @@ Project Organization
     │   └── raw            <- The original, immutable data dump.
     │
     │
-    ├── models             <- Trained and serialized models, model predictions, or model summaries
+    ├── models             <- Trained and serialized models(.h5py), model predictions, or model summaries
     │
     ├── notebooks          <- Jupyter notebooks. Naming convention is a number (for ordering),
     │                         the creator's initials, and a short `-` delimited description, e.g.
@@ -46,8 +46,7 @@ Project Organization
         │
         ├── models         <- Scripts to train models and then use trained models to make
         │   │                 predictions
-        │   ├── predict_model.py
-        │   └── train_model.py
+        │   └── cnn_lstm.py
         │
         ├── visualization  <- Scripts to create exploratory and results oriented visualizations
         │   └── visualize.py
