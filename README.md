@@ -1,4 +1,4 @@
-NCC-AI
+NCC-AI/ SceneClassification
 ==============================
 
 classification of surgical video scene
