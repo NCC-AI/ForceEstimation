@@ -40,7 +40,7 @@ Project Organization
         ├── reader           <- Scripts to download or generate data
         │   └── make_dataset.py
         │
-        ├── generator       <- Scripts to turn raw data into features for modeling
+        ├── generators       <- Scripts to turn raw data into features for modeling
         │   └── build_features.py
         │
         ├── models         <- Scripts to train models and then use trained models to make
