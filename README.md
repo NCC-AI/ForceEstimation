@@ -1,12 +1,12 @@
 
-NCC-AI/ SceneClassification
+NCC-AI/ ForceEstimation
 ==============================
 
-classification of surgical video scene
+Estimate how strong the forceps is pulling organ using deep neural network.
 
 Objective
 ------------
-Classify surgery scene into 11 cases in real time.
+Visualize how strong the forceps is pulling organ from video.
 
 Project Organization
 ------------
@@ -54,36 +54,16 @@ Project Organization
 
 Shared Data Path
 ------------
-Surgery Movie. Its duration is about two hours.
 
-All data used in this project is in the DLB1 extended HDD (12T). 
-
-    /mnt
-    └──hdd
-        └─data
-            ├── movies
-            │   ├── case05_HEIGHT720_FPS30.mp4
-            │   ├── case06_HEIGHT720_FPS30.mp4 
-            │
-            └── movie_frames
-                ├── case05_HEIGHT720_FPS30
-                │   ├─ 1.jpg
-                │   ├─ 2.jpg
-                │
-                ├── case06_HEIGHT720_FPS30
-                │   ├─ 1.jpg
-                │   ├─ 2.jpg
-                │
          
 Method
 ------------
-- Classify each frame(not time series) using  *Xception or Inceptionv3, ResNet*.
-- 3D CNN (time series)
+- Regression.
 
 Author
 ------------
-Hiroki Matsuzaki
+Hiroaki Takano
 
 Reference
 ------------
-[Xception, InceptionV3, ResNet50](https://keras.io/ja/applications/)
+  
