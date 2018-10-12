@@ -30,6 +30,11 @@ from force_utils import database, save_history
 # DATASET
 # -------------------------------------------------------------------------------------
 
+# Input
+x_train = np.load('./dataset/features/bottleneck_features_train.npy')
+x_test = np.load('./dataset/features/bottleneck_features_validation.npy')
+
+
 # Make force_dic = {image_file_name : force_value}
 movie_file = 'dataset/movie.mp4'
 csv_file = 'dataset/forceinfo.csv'
@@ -42,42 +47,16 @@ for i in range(len(frames)):
 
 # Split train and validation
 keys = list(force_dic.keys())
+values = list(force_dic.values())
 train_num = int(round(0.8 * len(keys)))
-train_keys = keys[:train_num]
-val_keys = keys[train_num:]
-val_num = len(val_keys)
 
-# -------------------------------------------------------------------------------------
-# GENERATOR
-# -------------------------------------------------------------------------------------
-
-def generate_from_directory(train=True, batch_size=32):
-    while True:
-        x, y, i = [], [], 0
-        if train:
-            random.shuffle(train_keys)
-            for image_file in train_keys:
-                image = load_img('dataset/frames/' + image_file, target_size=(299, 299))
-                image = img_to_array(image) 
-                image /= 255.
-                x.append(image)
-                y.append(force_dic[image_file])
-                i += 1
-                if i == batch_size:
-                    yield (np.array(x), np.array(y))
-                    x, y, i = [], [], 0
-        else:
-            random.shuffle(val_keys)
-            for image_file in val_keys:
-                image = load_img('dataset/frames/' + image_file, target_size=(299, 299))
-                image = img_to_array(image) 
-                image /= 255.
-                x.append(image)
-                y.append(force_dic[image_file])
-                i += 1
-                if i == batch_size:
-                    yield (np.array(x), np.array(y))
-                    x, y, i = [], [], 0
+# Target
+y_train = values[:train_num]
+for x in values[:30]:
+    y_train.append(x)
+y_test = values[train_num:]
+for x in values[train_num:][:8]:
+    y_test.append(x)
 
 # -------------------------------------------------------------------------------------
 # VARIABLE
@@ -117,7 +96,7 @@ def schedule(epoch, decay=0.9):
 
 # Callbacks
 callbacks = [
-    ModelCheckpoint('dataset/weights/weights_{epoch:02d}.h5', monitor='val_loss', verbose=1, save_best_only=True),
+    ModelCheckpoint('dataset/weights/weights_npy_{epoch:02d}.h5', monitor='val_loss', verbose=1, save_best_only=True),
     EarlyStopping(monitor='val_loss', min_delta=0, patience=5, verbose=1, mode='auto')]
     # LearningRateScheduler(schedule)]
 
@@ -128,12 +107,12 @@ model.compile(optimizer=optim, loss='mean_squared_error')
 # FIT
 # -------------------------------------------------------------------------------------
 
-history = model.fit_generator(
-    generate_from_directory(train=True, batch_size=batch_size),
-    steps_per_epoch=train_num/batch_size,
+history = model.fit(
+    x_train, y_train,
+    batch_size=batch_size,
     epochs=epochs,
     callbacks=callbacks,
-    validation_data=generate_from_directory(train=False, batch_size=batch_size),
-    validation_steps=val_num/batch_size)
+    validation_data=(x_test, y_test)
+)
 
-save_history(history, 'dataset/history/history.txt')
+save_history(history, 'dataset/history/history_npy.txt')
