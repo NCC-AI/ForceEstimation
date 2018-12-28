@@ -6,7 +6,7 @@ import shutil
 import numpy as np
 from PIL import Image
 
-from fe_dataset import get_video, get_csv
+from src.fe_dataset import get_video, get_csv
 
 def to_frames(video_file, image_dir, image_file='%s.jpg'):
     if os.path.exists(image_dir):
@@ -25,27 +25,27 @@ def to_frames(video_file, image_dir, image_file='%s.jpg'):
     cap.release()
 
 def predict(video_file, csv_file, start_frame, model):
-    video       = get_video(video_file)
-    cap         = video['cap']
-    font        = cv2.FONT_HERSHEY_SIMPLEX
-    font_size   = 1
+    video = get_video(video_file)
+    cap = video['cap']
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    font_size = 1
     input_shape = model.input_shape
-    max_value   = int(np.max(get_csv(csv_file)['F']))
+    max_value = int(np.max(get_csv(csv_file)['F']))
     width, height = video['frame_width'], video['frame_height']
-    xmin, xmax  = int(width * 0.85), int(width * 0.90)
-    ymax, ydif  = int(height * 0.80), int(height * 0.05)
+    xmin, xmax = int(width * 0.85), int(width * 0.90)
+    ymax, ydif = int(height * 0.80), int(height * 0.05)
     cap.set(1, start_frame)
 
     while(cap.isOpened()):
         ret, frame = cap.read()
         if ret == False:
             break
-        frame_id   = cap.get(1)
-        img        = Image.fromarray(np.uint8(frame[:,:,:])).resize((input_shape[0], input_shape[1]))
-        img        = np.asarray(img)
-        img        = img[np.newaxis, :, :, :]
-        pred       = model.predict(img / 255.0)[0][0]
-        meter      = pred / max_value
+        frame_id = cap.get(1)
+        img = Image.fromarray(np.uint8(frame[:,:,:])).resize((input_shape[0], input_shape[1]))
+        img = np.asarray(img)
+        img = img[np.newaxis, :, :, :]
+        pred = model.predict(img / 255.0)[0][0]
+        meter = pred / max_value
         
         if pred > 3:
             color = (0,0,255)
@@ -54,15 +54,18 @@ def predict(video_file, csv_file, start_frame, model):
         else:
             color = (255,0,0)
             
-        dst = cv2.rectangle(frame,
-                            (xmin, ymax + int(height * (-0.60 * meter))),
-                            (xmax, ymax), color, -1)
+        dst = cv2.rectangle(
+            frame,
+            (xmin, ymax + int(height * (-0.60 * meter))),
+            (xmax, ymax), color, -1)
         
-        dst = cv2.putText(dst, str(np.round(pred, 3)),
-                          (xmin, int(height * (-0.60 * meter + 0.78))), font, font_size, color, 2, cv2.LINE_AA)
+        dst = cv2.putText(
+            dst, str(np.round(pred, 3)),
+            (xmin, int(height * (-0.60 * meter + 0.78))), font, font_size, color, 2, cv2.LINE_AA)
         
-        dst = cv2.putText(dst, str(int(frame_id)),
-                          (xmin, ymax + ydif), font, font_size, 'white', 2, cv2.LINE_AA)
+        dst = cv2.putText(
+            dst, str(int(frame_id)),
+            (xmin, ymax + ydif), font, font_size, 'white', 2, cv2.LINE_AA)
         
         cv2.imshow('frame', dst)
         if cv2.waitKey(1) & 0xFF == ord('q'):
